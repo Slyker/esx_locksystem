@@ -18,7 +18,7 @@ Modified Version Of ESX Locksystem
 ```
 start esx_locksystem
 ```
-For help with ESX AIOMenu, the new version of ESX Identity, or the new version of ESX Locksystem, please join the discord via this link: https://discord.gg/3ECcWxn
+For help with ESX AIOMenu, the new version of ESX Identity, or the new version of ESX Locksystem, please join the discord via this link: https://discord.gg/vF5am5V
 
 ## Credits
 * Lead Coder: ArkSeyonet
