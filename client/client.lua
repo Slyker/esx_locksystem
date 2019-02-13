@@ -432,10 +432,10 @@ function Notify(text, duration)
 			end
 			SetNotificationTextEntry("STRING")
 			AddTextComponentString(text)
-			Citizen.InvokeNative(0x1E6611149DB3DB6B, "CHAR_LIFEINVADER", "CHAR_LIFEINVADER", true, 1, "LockSystem V" .. _VERSION, "By Deediezi", duration)
+			Citizen.InvokeNative(0x1E6611149DB3DB6B, "CHAR_LIFEINVADER", "CHAR_LIFEINVADER", true, 1, "ESX LockSystem" .. _VERSION, "By ArkSeyonet(Credits: Deediezi)", duration)
 			DrawNotification_4(false, true)
 		elseif(Config.notification == 2)then
-			TriggerEvent('chatMessage', '^1LockSystem V' .. _VERSION, {255, 255, 255}, text)
+			TriggerEvent('chatMessage', '^1ESX LockSystem' .. _VERSION, {255, 255, 255}, text)
 		else
 			return
 		end
