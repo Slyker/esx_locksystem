@@ -1,5 +1,7 @@
 resource_manifest_version "05cfa83c-a124-4cfa-a768-c24a5811d8f9"
 
+version '2.0'
+
 client_scripts {
     '@es_extended/locale.lua',
     "config/shared.lua",
@@ -19,10 +21,22 @@ server_scripts {
     'locales/pl.lua'
 }
 
+dependency 'es_extended'
+
 ui_page 'client/html/index.html'
 
 files {
     'client/html/index.html',
     'client/html/sounds/lock.ogg',
-    'client/html/sounds/unlock.ogg'
+    'client/html/sounds/unlock.ogg',
+	'client/html/sounds/lock2.ogg',
+	'client/html/sounds/unlock2.ogg'
+}
+
+server_exports {
+  'getKey'
+}
+
+exports {
+  'doLockSystemToggleLocks'
 }

@@ -13,18 +13,19 @@ owners = {} -- owners[plate] = identifier
 secondOwners = {} -- secondOwners[plate] = {identifier, identifier, ...}
 MySQL.ready(function ()
     MySQL.Async.fetchAll("SELECT `plate`, `owner` FROM owned_vehicles",{}, function(data)
-        for _,v in pairs(data) do
+        for k,v in pairs(data) do
             local plate = string.lower(v.plate)
             owners[plate] = v.owner
         end
     end)
 end)
+
 RegisterServerEvent("ls:retrieveVehiclesOnconnect")
 AddEventHandler("ls:retrieveVehiclesOnconnect", function()
     local src = source
     local srcIdentifier = GetPlayerIdentifiers(src)[1]
     local data = MySQL.Sync.fetchAll("SELECT `plate`, `owner` FROM owned_vehicles",{})
-    for _,v in pairs(data) do
+    for k,v in pairs(data) do
         local plate = string.lower(v.plate)
         owners[plate] = v.owner
     end
@@ -36,7 +37,7 @@ AddEventHandler("ls:retrieveVehiclesOnconnect", function()
     end
 
     for plate, identifiers in pairs(secondOwners) do
-        for _, plyIdentifier in ipairs(identifiers) do
+        for k, plyIdentifier in ipairs(identifiers) do
             if(plyIdentifier == srcIdentifier)then
                 TriggerClientEvent("ls:newVehicle", src, plate, nil, nil)
             end
@@ -52,12 +53,14 @@ AddEventHandler("ls:addOwner", function(plate)
 
     owners[plate] = identifier
 end)
+
 RegisterServerEvent("ls:addOwnerWithIdentifier")
 AddEventHandler("ls:addOwnerWithIdentifier", function(targetIdentifier, plate)
     local plate = string.lower(plate)
 
     owners[plate] = targetIdentifier
 end)
+
 RegisterServerEvent("ls:addSecondOwner")
 AddEventHandler("ls:addSecondOwner", function(targetIdentifier, plate)
     local plate = string.lower(plate)
@@ -98,6 +101,35 @@ end)
 RegisterServerEvent("ls:haveKeys")
 AddEventHandler("ls:haveKeys", function(target, vehPlate, cb)
     targetIdentifier = GetPlayerIdentifiers(target)[1]
+    local hasKey = false
+
+    for plate, identifier in pairs(owners) do
+        if(plate == vehPlate and identifier == targetIdentifier)then
+            hasKey = true
+            break
+        end
+    end
+    for plate, identifiers in pairs(secondOwners) do
+        if(plate == vehPlate)then
+            for k, plyIdentifier in ipairs(identifiers) do
+                if(plyIdentifier == targetIdentifier)then
+                    hasKey = true
+                    break
+                end
+            end
+        end
+    end
+
+    if hasKey == true then
+        cb(true)
+    else
+        cb(false)
+    end
+end)
+
+function getKey(PlayerID, newPlate, cb)
+	targetIdentifier = GetPlayerIdentifiers(PlayerID)[1]
+	vehPlate = newPlate
     hasKey = false
 
     for plate, identifier in pairs(owners) do
@@ -108,7 +140,7 @@ AddEventHandler("ls:haveKeys", function(target, vehPlate, cb)
     end
     for plate, identifiers in pairs(secondOwners) do
         if(plate == vehPlate)then
-            for _, plyIdentifier in ipairs(identifiers) do
+            for k, plyIdentifier in ipairs(identifiers) do
                 if(plyIdentifier == targetIdentifier)then
                     hasKey = true
                     break
@@ -116,13 +148,16 @@ AddEventHandler("ls:haveKeys", function(target, vehPlate, cb)
             end
         end
     end
+	
 
-    if(hasKey)then
-        cb(true)
+    if hasKey == true then
+        cb = true
+		return cb
     else
-        cb(false)
+		cb = false
+        return cb
     end
-end)
+end
 
 RegisterServerEvent("ls:updateServerVehiclePlate")
 AddEventHandler("ls:updateServerVehiclePlate", function(oldPlate, newPlate)
@@ -146,11 +181,11 @@ AddEventHandler('InteractSound_SV:PlayWithinDistance', function(maxDistance, sou
 end)
 
 if Config.versionChecker then
-    PerformHttpRequest("https://rawgit.com/Xseba360/esx_locksystem/master/VERSION", function(err, rText, headers)
+    PerformHttpRequest("https://raw.githubusercontent.com/ArkSeyonet/esx_locksystem/master/VERSION", function(err, rText, headers)
 		if rText then
 			if tonumber(rText) > tonumber(_VERSION) then
 				print("\n---------------------------------------------------")
-				print("LockSystem : An update is available !")
+				print("ESX LockSystem has an update available!")
 				print("---------------------------------------------------")
 				print("Current : " .. _VERSION)
 				print("Latest  : " .. rText .. "\n")

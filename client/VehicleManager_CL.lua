@@ -41,20 +41,39 @@ function newVehicle()
     -- 2 = locked
     -- 4 = locked and player can't get out
     rTable.lock = function()
-        lockStatus = self.lockStatus
-        if(lockStatus <= 2)then
-            self.lockStatus = 4
-            SetVehicleDoorsLocked(self.id, self.lockStatus)
-            SetVehicleDoorsLockedForAllPlayers(self.id, 1)
-            TriggerEvent("ls:notify", _U("vehicle_locked"))
-            TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock", 1.0)
-        elseif(lockStatus > 2)then
-            self.lockStatus = 1
-            SetVehicleDoorsLocked(self.id, self.lockStatus)
-            SetVehicleDoorsLockedForAllPlayers(self.id, false)
-            TriggerEvent("ls:notify", _U("vehicle_unlocked"))
-            TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "unlock", 1.0)
-        end
+	
+		local ply = GetPlayerPed(-1)
+		if(IsPedInAnyVehicle(ply, true))then
+			lockStatus = self.lockStatus
+			if(lockStatus <= 2)then
+				self.lockStatus = 4
+				SetVehicleDoorsLocked(self.id, self.lockStatus)
+				SetVehicleDoorsLockedForAllPlayers(self.id, 1)
+				TriggerEvent("ls:notify", _U("vehicle_locked"))
+				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock", 1.0)
+			elseif(lockStatus > 2)then
+				self.lockStatus = 1
+				SetVehicleDoorsLocked(self.id, self.lockStatus)
+				SetVehicleDoorsLockedForAllPlayers(self.id, false)
+				TriggerEvent("ls:notify", _U("vehicle_unlocked"))
+				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "unlock", 1.0)
+			end
+		else
+			lockStatus = self.lockStatus
+			if(lockStatus <= 2)then
+				self.lockStatus = 4
+				SetVehicleDoorsLocked(self.id, self.lockStatus)
+				SetVehicleDoorsLockedForAllPlayers(self.id, 1)
+				TriggerEvent("ls:notify", _U("vehicle_locked"))
+				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock2", 0.2)
+			elseif(lockStatus > 2)then
+				self.lockStatus = 1
+				SetVehicleDoorsLocked(self.id, self.lockStatus)
+				SetVehicleDoorsLockedForAllPlayers(self.id, false)
+				TriggerEvent("ls:notify", _U("vehicle_unlocked"))
+				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "unlock2", 1.0)
+			end
+		end
     end
 
     -- Setters

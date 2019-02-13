@@ -5,8 +5,6 @@ Modified Version Of ESX Locksystem
 
 ## Requirements
 * [es_extended](https://github.com/ESX-Org/es_extended)
-* [esx_vehicleshop](https://github.com/ESX-Org/esx_vehicleshop)
-* [esx_policejob](https://github.com/ESX-Org/esx_policejob)
 
 
 
@@ -18,7 +16,7 @@ Modified Version Of ESX Locksystem
 ```
 start esx_locksystem
 ```
-For help with ESX AIOMenu, the new version of ESX Identity, or the new version of ESX Locksystem, please join the discord via this link: https://discord.gg/vF5am5V
+For help with ESX AIOMenu, the new version of ESX Identity, or the new version of ESX Locksystem, please join the discord via this link: https://discord.gg/3ECcWxn
 
 ## Credits
 * Lead Coder: ArkSeyonet
@@ -28,11 +26,10 @@ For help with ESX AIOMenu, the new version of ESX Identity, or the new version o
 * QA 2: Circles
 * QA 3: Vacant
 
-
 * Special thanks to the original creator of the script, Deediezi. His script can be found here:
 [FiveM_Locksystem](https://forum.fivem.net/t/release-locksystem-3-1-updated-the-07-16-2018-beta/17750)
 * Special thanks to the person who originally converted the script to ESX, xseba360. His script can be found here:
-[ESX_Locksystem](https://github.com/Xseba360/esx_locksystem)
+[ESX_Locksystem] (https://github.com/Xseba360/esx_locksystem)
 
 ## Licensing
 

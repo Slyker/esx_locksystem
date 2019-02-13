@@ -2,6 +2,7 @@ Locales['en'] = {
     ['vehicle_locked'] = 'Vehicle locked',
     ['vehicle_unlocked']  = 'Vehicle unlocked',
     ['keys_not_inside'] = 'The keys aren\'t inside',
+	['lastCar_not_nil'] = 'Last Car Is Not Nil',
     ['lock_cooldown'] = 'You have to wait %s seconds',
     ['vehicle_not_owned'] = 'This vehicle is not yours',
     ['missing_argument_first'] = 'First missing argument : /givekey <id> <plate>',

@@ -11,7 +11,9 @@
 
 ----
 -- @var vehicles[plate_number] = newVehicle Object
-local vehicles = {}
+local vehicles 	= {}
+local lastCar 	= nil
+ESX				= nil
 
 ---- Retrieve the keys of a player when he reconnects.
 -- The keys are synchronized with the server. If you restart the server, all keys disappear.
@@ -22,11 +24,17 @@ end)
 ---- Main thread
 -- The logic of the script is here
 Citizen.CreateThread(function()
+
+	while ESX == nil do
+		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+		Citizen.Wait(0)
+	end
+	
     while true do
         Wait(0)
 
         -- If the defined key is pressed
-        if(IsControlJustPressed(1, Config.key))then
+        if(IsControlJustPressed(1, 11))then
 
             -- Init player infos
             local ply = GetPlayerPed(-1)
@@ -40,8 +48,12 @@ Citizen.CreateThread(function()
                 localVehId = GetVehiclePedIsIn(GetPlayerPed(-1), false)
                 isInside = true
             else
-                -- by targeting the vehicle
-                localVehId = GetTargetedVehicle(pCoords, ply)
+				if lastCar ~= nil then
+					localVehId = lastCar
+				else
+					-- by targeting the vehicle
+					localVehId = GetTargetedVehicle(pCoords, ply)
+				end
             end
 
             -- Get targeted vehicle infos
@@ -62,8 +74,36 @@ Citizen.CreateThread(function()
                                     -- update the vehicle infos (Useful for hydrating instances created by the /givekey command)
                                     vehicle.update(localVehId, localVehLockStatus)
                                     -- Lock or unlock the vehicle
-                                    vehicle.lock()
-                                    time = 0
+									if(IsPedInAnyVehicle(ply, true))then
+										vehicle.lock()
+										time = 0
+										if lastCar == nil then
+											lastCar = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+										else
+											if lastCar ~= localVehId then
+												lastCar = localVehId
+											end
+										end
+									else
+										time = 0
+										local lib = "anim@mp_player_intmenu@key_fob@"
+										local anim = "fob_click"
+						
+										ESX.Streaming.RequestAnimDict(lib, function()
+											TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
+										end)
+
+										Wait(250)
+										vehicle.lock()
+										if lastCar == nil then
+											lastCar = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+										else
+											if lastCar ~= localVehId then
+												lastCar = localVehId
+											end
+										end
+										
+									end
                                 else
                                     TriggerEvent("ls:notify", _U("lock_cooldown", (timer / 1000)))
                                 end
@@ -98,6 +138,108 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
+function doLockSystemToggleLocks()
+	-- Init player infos
+	local ply = GetPlayerPed(-1)
+	local pCoords = GetEntityCoords(ply, true)
+	local px, py, pz = table.unpack(GetEntityCoords(ply, true))
+	isInside = false
+
+	-- Retrieve the local ID of the targeted vehicle
+	if(IsPedInAnyVehicle(ply, true))then
+		-- by sitting inside him
+		localVehId = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+		isInside = true
+	else
+		if lastCar ~= nil then
+			localVehId = lastCar
+		else
+			-- by targeting the vehicle
+			localVehId = GetTargetedVehicle(pCoords, ply)
+		end
+	end
+
+	-- Get targeted vehicle infos
+	if(localVehId and localVehId ~= 0)then
+		local localVehPlateTest = GetVehicleNumberPlateText(localVehId)
+		if localVehPlateTest ~= nil then
+			local localVehPlate = string.lower(localVehPlateTest)
+			local localVehLockStatus = GetVehicleDoorLockStatus(localVehId)
+			local hasKey = false
+
+			-- If the vehicle appear in the table (if this is the player's vehicle or a locked vehicle)
+			for plate, vehicle in pairs(vehicles) do
+				if(string.lower(plate) == localVehPlate)then
+					-- If the vehicle is not locked (this is the player's vehicle)
+					if(vehicle ~= "locked")then
+						hasKey = true
+						if(time > timer)then
+							-- update the vehicle infos (Useful for hydrating instances created by the /givekey command)
+							vehicle.update(localVehId, localVehLockStatus)
+							-- Lock or unlock the vehicle
+							if(IsPedInAnyVehicle(ply, true))then
+								vehicle.lock()
+								time = 0
+								if lastCar == nil then
+									lastCar = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+								else
+									if lastCar ~= localVehId then
+										lastCar = localVehId
+									end
+								end
+							else
+								time = 0
+								local lib = "anim@mp_player_intmenu@key_fob@"
+								local anim = "fob_click"
+				
+								ESX.Streaming.RequestAnimDict(lib, function()
+									TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
+								end)
+
+								Wait(250)
+								vehicle.lock()
+								if lastCar == nil then
+									lastCar = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+								else
+									if lastCar ~= localVehId then
+										lastCar = localVehId
+									end
+								end
+								
+							end
+						else
+							TriggerEvent("ls:notify", _U("lock_cooldown", (timer / 1000)))
+						end
+					else
+						TriggerEvent("ls:notify", _U("keys_not_inside"))
+					end
+				end
+			end
+
+			-- If the player doesn't have the keys
+			if(not hasKey)then
+				-- If the player is inside the vehicle
+				if(isInside)then
+					-- If the player find the keys
+					if(canSteal())then
+						-- Check if the vehicle is already owned.
+						-- And send the parameters to create the vehicle object if this is not the case.
+						TriggerServerEvent('ls:checkOwner', localVehId, localVehPlate, localVehLockStatus)
+					else
+						-- If the player doesn't find the keys
+						-- Lock the vehicle (players can't try to find the keys again)
+						vehicles[localVehPlate] = "locked"
+						TriggerServerEvent("ls:lockTheVehicle", localVehPlate)
+						TriggerEvent("ls:notify", _U("keys_not_inside"))
+					end
+				end
+			end
+		else
+			TriggerEvent("ls:notify", _U("could_not_find_plate"))
+		end
+	end
+end
 
 ---- Timer
 Citizen.CreateThread(function()
