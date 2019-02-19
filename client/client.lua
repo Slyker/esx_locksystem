@@ -34,7 +34,7 @@ Citizen.CreateThread(function()
         Wait(0)
 
         -- If the defined key is pressed
-        if(IsControlJustPressed(1, 11))then
+        if(IsControlJustPressed(1, 42))then
 
             -- Init player infos
             local ply = GetPlayerPed(-1)
