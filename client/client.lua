@@ -18,7 +18,7 @@ ESX				= nil
 ---- Retrieve the keys of a player when he reconnects.
 -- The keys are synchronized with the server. If you restart the server, all keys disappear.
 AddEventHandler("playerSpawned", function()
-    TriggerServerEvent("ls:retrieveVehiclesOnconnect")
+    TriggerServerEvent("esx_locksystem:retrieveVehiclesOnconnect")
 end)
 
 ---- Main thread
@@ -105,10 +105,10 @@ Citizen.CreateThread(function()
 										
 									end
                                 else
-                                    TriggerEvent("ls:notify", _U("lock_cooldown", (timer / 1000)))
+                                    TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
                                 end
                             else
-                                TriggerEvent("ls:notify", _U("keys_not_inside"))
+                                TriggerEvent("esx_locksystem:notify", _U("keys_not_inside"))
                             end
                         end
                     end
@@ -121,18 +121,18 @@ Citizen.CreateThread(function()
                             if(canSteal())then
                                 -- Check if the vehicle is already owned.
                                 -- And send the parameters to create the vehicle object if this is not the case.
-                                TriggerServerEvent('ls:checkOwner', localVehId, localVehPlate, localVehLockStatus)
+                                TriggerServerEvent('esx_locksystem:checkOwner', localVehId, localVehPlate, localVehLockStatus)
                             else
                                 -- If the player doesn't find the keys
                                 -- Lock the vehicle (players can't try to find the keys again)
                                 vehicles[localVehPlate] = "locked"
-                                TriggerServerEvent("ls:lockTheVehicle", localVehPlate)
-                                TriggerEvent("ls:notify", _U("keys_not_inside"))
+                                TriggerServerEvent("esx_locksystem:lockTheVehicle", localVehPlate)
+                                TriggerEvent("esx_locksystem:notify", _U("keys_not_inside"))
                             end
                         end
                     end
                 else
-                    TriggerEvent("ls:notify", _U("could_not_find_plate"))
+                    TriggerEvent("esx_locksystem:notify", _U("could_not_find_plate"))
                 end
             end
         end
@@ -209,10 +209,10 @@ function doLockSystemToggleLocks()
 								
 							end
 						else
-							TriggerEvent("ls:notify", _U("lock_cooldown", (timer / 1000)))
+							TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
 						end
 					else
-						TriggerEvent("ls:notify", _U("keys_not_inside"))
+						TriggerEvent("esx_locksystem:notify", _U("keys_not_inside"))
 					end
 				end
 			end
@@ -225,18 +225,18 @@ function doLockSystemToggleLocks()
 					if(canSteal())then
 						-- Check if the vehicle is already owned.
 						-- And send the parameters to create the vehicle object if this is not the case.
-						TriggerServerEvent('ls:checkOwner', localVehId, localVehPlate, localVehLockStatus)
+						TriggerServerEvent('esx_locksystem:checkOwner', localVehId, localVehPlate, localVehLockStatus)
 					else
 						-- If the player doesn't find the keys
 						-- Lock the vehicle (players can't try to find the keys again)
 						vehicles[localVehPlate] = "locked"
-						TriggerServerEvent("ls:lockTheVehicle", localVehPlate)
-						TriggerEvent("ls:notify", _U("keys_not_inside"))
+						TriggerServerEvent("esx_locksystem:lockTheVehicle", localVehPlate)
+						TriggerEvent("esx_locksystem:notify", _U("keys_not_inside"))
 					end
 				end
 			end
 		else
-			TriggerEvent("ls:notify", _U("could_not_find_plate"))
+			TriggerEvent("esx_locksystem:notify", _U("could_not_find_plate"))
 		end
 	end
 end
@@ -295,8 +295,8 @@ end
 ---- Update a vehicle plate (for developers)
 -- @param string oldPlate
 -- @param string newPlate
-RegisterNetEvent("ls:updateVehiclePlate")
-AddEventHandler("ls:updateVehiclePlate", function(oldPlate, newPlate)
+RegisterNetEvent("esx_locksystem:updateVehiclePlate")
+AddEventHandler("esx_locksystem:updateVehiclePlate", function(oldPlate, newPlate)
     local oldPlate = string.lower(oldPlate)
     local newPlate = string.lower(newPlate)
 
@@ -304,7 +304,7 @@ AddEventHandler("ls:updateVehiclePlate", function(oldPlate, newPlate)
         vehicles[newPlate] = vehicles[oldPlate]
         vehicles[oldPlate] = nil
 
-        TriggerServerEvent("ls:updateServerVehiclePlate", oldPlate, newPlate)
+        TriggerServerEvent("esx_locksystem:updateServerVehiclePlate", oldPlate, newPlate)
     end
 end)
 
@@ -314,15 +314,15 @@ end)
 -- @param int localVehId
 -- @param string localVehPlate
 -- @param int localVehLockStatus
-RegisterNetEvent("ls:getHasOwner")
-AddEventHandler("ls:getHasOwner", function(hasOwner, localVehId, localVehPlate, localVehLockStatus)
+RegisterNetEvent("esx_locksystem:getHasOwner")
+AddEventHandler("esx_locksystem:getHasOwner", function(hasOwner, localVehId, localVehPlate, localVehLockStatus)
     if(not hasOwner)then
-        TriggerEvent("ls:newVehicle", localVehPlate, localVehId, localVehLockStatus)
-        TriggerServerEvent("ls:addOwner", localVehPlate)
+        TriggerEvent("esx_locksystem:newVehicle", localVehPlate, localVehId, localVehLockStatus)
+        TriggerServerEvent("esx_locksystem:addOwner", localVehPlate)
 
-        TriggerEvent("ls:notify", getRandomMsg())
+        TriggerEvent("esx_locksystem:notify", getRandomMsg())
     else
-        TriggerEvent("ls:notify", _U("vehicle_not_owned"))
+        TriggerEvent("esx_locksystem:notify", _U("vehicle_not_owned"))
     end
 end)
 
@@ -330,8 +330,8 @@ end)
 -- @param int id [opt]
 -- @param string plate
 -- @param string lockStatus [opt]
-RegisterNetEvent("ls:newVehicle")
-AddEventHandler("ls:newVehicle", function(plate, id, lockStatus)
+RegisterNetEvent("esx_locksystem:newVehicle")
+AddEventHandler("esx_locksystem:newVehicle", function(plate, id, lockStatus)
     if(plate)then
         local plate = string.lower(plate)
         if(not id)then id = nil end
@@ -346,10 +346,10 @@ end)
 ---- Event called from server when a player execute the /givekey command
 -- Create a new vehicle object with its plate
 -- @param string plate
-RegisterNetEvent("ls:giveKeys")
-AddEventHandler("ls:giveKeys", function(plate)
+RegisterNetEvent("esx_locksystem:giveKeys")
+AddEventHandler("esx_locksystem:giveKeys", function(plate)
     local plate = string.lower(plate)
-    TriggerEvent("ls:newVehicle", plate, nil, nil)
+    TriggerEvent("esx_locksystem:newVehicle", plate, nil, nil)
 end)
 
 ---- Piece of code from Scott's InteractSound script : https://forum.fivem.net/t/release-play-custom-sounds-for-interactions/8282
@@ -368,8 +368,8 @@ AddEventHandler('InteractSound_CL:PlayWithinDistance', function(playerNetId, max
     end
 end)
 
-RegisterNetEvent('ls:notify')
-AddEventHandler('ls:notify', function(text, duration)
+RegisterNetEvent('esx_locksystem:notify')
+AddEventHandler('esx_locksystem:notify', function(text, duration)
 	Notify(text, duration)
 end)
 
