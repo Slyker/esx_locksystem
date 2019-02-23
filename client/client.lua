@@ -13,6 +13,9 @@
 -- @var vehicles[plate_number] = newVehicle Object
 local vehicles 	= {}
 ESX				= nil
+localVehId		= 0
+savedVehicle	= 0
+isTheCarOwner = false
 
 ---- Retrieve the keys of a player when he reconnects.
 -- The keys are synchronized with the server. If you restart the server, all keys disappear.
@@ -44,10 +47,7 @@ function doLockSystemToggleLocks()
 	local ply = GetPlayerPed(-1)
 	local pos = GetEntityCoords(ply)
 	local vehicle = GetClosestVehicle(pos['x'], pos['y'], pos['z'], 5.001, 0, 70)
-
 	isInside = false
-	
-	ESX.ShowNotification('Vehicle: ' .. vehicle)
 	
 	-- Retrieve the local ID of the targeted vehicle
 	if(IsPedInAnyVehicle(ply, true))then
@@ -55,66 +55,131 @@ function doLockSystemToggleLocks()
 		localVehId = GetVehiclePedIsIn(GetPlayerPed(-1), false)
 		isInside = true
 	else
-		localVehId = vehicle
+		if (vehicle ~= 0) then
+			
+			localVehId = vehicle
+			savedVehicle = vehicle
+		elseif (vehicle ~= 0) and (savedVehicle == vehicle) then
+			localVehId = vehicle	
+		elseif (vehicle == 0) then
+			localVehId = savedVehicle
+		end
 	end
-
+		
 	-- Get targeted vehicle infos
 	if(localVehId and localVehId ~= 0)then
 		local localVehPlateTest = GetVehicleNumberPlateText(localVehId)
 		if localVehPlateTest ~= nil then
 			local localVehPlate = string.lower(localVehPlateTest)
+			local newVehPlate = string.gsub(tostring(localVehPlate), "%s", "")
 			local localVehLockStatus = GetVehicleDoorLockStatus(localVehId)
 			local hasKey = false
-
-			-- If the vehicle appear in the table (if this is the player's vehicle or a locked vehicle)
-			for plate, vehicle in pairs(vehicles) do
-				if(string.lower(plate) == localVehPlate)then
-					-- If the vehicle is not locked (this is the player's vehicle)
-					if(vehicle ~= "locked")then
-						hasKey = true
-						if(time > timer)then
-							-- update the vehicle infos (Useful for hydrating instances created by the /givekey command)
-							vehicle.update(localVehId, localVehLockStatus)
-							-- Lock or unlock the vehicle
-							if(IsPedInAnyVehicle(ply, true))then
-								vehicle.lock()
-								time = 0
-							else
-								local lib = "anim@mp_player_intmenu@key_fob@"
-								local anim = "fob_click"
+			local myID = GetPlayerServerId(PlayerId())
+			TriggerServerEvent("esx_locksystem:haveKeys", myID, newVehPlate)
+			if isTheCarOwner then
+							if(time > timer)then
+								if(IsPedInAnyVehicle(ply, true))then
+									if localVehLockStatus <= 2 then
+										SetVehicleDoorsLocked(localVehId, 4)
+										SetVehicleDoorsLockedForAllPlayers(localVehId, 1)
+										TriggerEvent("esx_locksystem:notify", _U("vehicle_locked"))
+										TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock", 0.5)
+										time = 0
+									elseif localVehLockStatus > 2 then
+										SetVehicleDoorsLocked(localVehId, 1)
+										SetVehicleDoorsLockedForAllPlayers(localVehId, false)
+										TriggerEvent("esx_locksystem:notify", _U("vehicle_unlocked"))
+										TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "unlock", 0.5)
+										time = 0
+									end
+								else
+									if localVehLockStatus <= 2 then
+									
+										local lib = "anim@mp_player_intmenu@key_fob@"
+										local anim = "fob_click"
 				
-								ESX.Streaming.RequestAnimDict(lib, function()
-									TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
-								end)
+										ESX.Streaming.RequestAnimDict(lib, function()
+											TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
+										end)
 
-								Wait(250)
-								vehicle.lock()
-								time = 0
+										Wait(250)
+										SetVehicleDoorsLocked(localVehId, 4)
+										SetVehicleDoorsLockedForAllPlayers(localVehId, 1)
+										TriggerEvent("esx_locksystem:notify", _U("vehicle_locked"))
+										TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock2", 0.5)
+										time = 0
+									elseif localVehLockStatus > 2 then
+									
+										local lib = "anim@mp_player_intmenu@key_fob@"
+										local anim = "fob_click"
+					
+										ESX.Streaming.RequestAnimDict(lib, function()
+											TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
+										end)
+
+										Wait(250)
+									
+										SetVehicleDoorsLocked(localVehId, 1)
+										SetVehicleDoorsLockedForAllPlayers(localVehId, false)
+										TriggerEvent("esx_locksystem:notify", _U("vehicle_unlocked"))
+										TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock2", 0.5)
+										time = 0
+									end
+								end
+							else
+								TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
+							end
+			else
+				-- If the vehicle appear in the table (if this is the player's vehicle or a locked vehicle)
+				for plate, vehicle in pairs(vehicles) do
+					if(string.lower(plate) == localVehPlate)then
+						-- If the vehicle is not locked (this is the player's vehicle)
+						if(vehicle ~= "locked")then
+							hasKey = true
+							if(time > timer)then
+								-- update the vehicle infos (Useful for hydrating instances created by the /givekey command)
+								vehicle.update(localVehId, localVehLockStatus)
+								-- Lock or unlock the vehicle
+								if(IsPedInAnyVehicle(ply, true))then
+									vehicle.lock()
+									time = 0
+								else
+									local lib = "anim@mp_player_intmenu@key_fob@"
+									local anim = "fob_click"
+				
+									ESX.Streaming.RequestAnimDict(lib, function()
+										TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
+									end)
+
+									Wait(250)
+									vehicle.lock()
+									time = 0
+								end
+							else
+								TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
 							end
 						else
-							TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
+							TriggerEvent("esx_locksystem:notify", _U("keys_not_inside"))
 						end
-					else
-						TriggerEvent("esx_locksystem:notify", _U("keys_not_inside"))
 					end
 				end
-			end
 
-			-- If the player doesn't have the keys
-			if(not hasKey)then
+				-- If the player doesn't have the keys
+				if(not hasKey)then
 				-- If the player is inside the vehicle
-				if(isInside)then
-					-- If the player find the keys
-					if(canSteal())then
-						-- Check if the vehicle is already owned.
-						-- And send the parameters to create the vehicle object if this is not the case.
-						TriggerServerEvent('esx_locksystem:checkOwner', localVehId, localVehPlate, localVehLockStatus)
-					else
-						-- If the player doesn't find the keys
-						-- Lock the vehicle (players can't try to find the keys again)
-						vehicles[localVehPlate] = "locked"
-						TriggerServerEvent("esx_locksystem:lockTheVehicle", localVehPlate)
-						TriggerEvent("esx_locksystem:notify", _U("keys_not_inside"))
+					if(isInside)then
+						-- If the player find the keys
+						if(canSteal())then
+							-- Check if the vehicle is already owned.
+							-- And send the parameters to create the vehicle object if this is not the case.
+							TriggerServerEvent('esx_locksystem:checkOwner', localVehId, localVehPlate, localVehLockStatus)
+						else
+							-- If the player doesn't find the keys
+							-- Lock the vehicle (players can't try to find the keys again)
+							vehicles[localVehPlate] = "locked"
+							TriggerServerEvent("esx_locksystem:lockTheVehicle", localVehPlate)
+							TriggerEvent("esx_locksystem:notify", _U("keys_not_inside"))
+						end
 					end
 				end
 			end
@@ -174,6 +239,15 @@ end
 
 ------------------------    EVENTS      ------------------------
 ------------------------     :)         ------------------------
+
+RegisterNetEvent("esx_locksystem:setIsOwner")
+AddEventHandler("esx_locksystem:setIsOwner", function(callback)
+	if callback == true then
+		isTheCarOwner = true
+	else
+		isTheCarOwner = false
+	end	
+end)
 
 ---- Update a vehicle plate (for developers)
 -- @param string oldPlate
@@ -239,14 +313,33 @@ end)
 -- I've decided to use only one part of its script so that administrators don't have to download more scripts. I hope you won't forget to thank him!
 RegisterNetEvent('InteractSound_CL:PlayWithinDistance')
 AddEventHandler('InteractSound_CL:PlayWithinDistance', function(playerNetId, maxDistance, soundFile, soundVolume)
-    local lCoords = GetEntityCoords(GetPlayerPed(-1))
+    local lCoords = GetEntityCoords(localVehId, false)
     local eCoords = GetEntityCoords(GetPlayerPed(GetPlayerFromServerId(playerNetId)))
     local distIs  = Vdist(lCoords.x, lCoords.y, lCoords.z, eCoords.x, eCoords.y, eCoords.z)
-    if(distIs <= maxDistance) then
+	local farSound
+    if(distIs < maxDistance) then
         SendNUIMessage({
             transactionType     = 'playSound',
             transactionFile     = soundFile,
             transactionVolume   = soundVolume
+        })
+	elseif distIs >= maxDistance and distIs < 15.0 then
+        SendNUIMessage({
+            transactionType     = 'playSound',
+            transactionFile     = soundFile,
+            transactionVolume   = 0.25
+        })
+	elseif distIs >= 15.0 and distIs < 30.0 then
+        SendNUIMessage({
+            transactionType     = 'playSound',
+            transactionFile     = soundFile,
+            transactionVolume   = 0.15
+        })
+	elseif distIs >= 30.0 and distIs < 50.0 then
+        SendNUIMessage({
+            transactionType     = 'playSound',
+            transactionFile     = soundFile,
+            transactionVolume   = 0.05
         })
     end
 end)
@@ -315,7 +408,7 @@ function Notify(text, duration)
 			end
 			SetNotificationTextEntry("STRING")
 			AddTextComponentString(text)
-			Citizen.InvokeNative(0x1E6611149DB3DB6B, "CHAR_LIFEINVADER", "CHAR_LIFEINVADER", true, 1, "ESX LockSystem" .. _VERSION, "By ArkSeyonet(Credits: Deediezi)", duration)
+			Citizen.InvokeNative(0x1E6611149DB3DB6B, "CHAR_LIFEINVADER", "CHAR_LIFEINVADER", true, 1, "ESX LockSystem" .. _VERSION, "\"Lock All Your Doors\"", duration)
 			DrawNotification_4(false, true)
 		elseif(Config.notification == 2)then
 			TriggerEvent('chatMessage', '^1ESX LockSystem' .. _VERSION, {255, 255, 255}, text)
@@ -326,3 +419,14 @@ function Notify(text, duration)
 		return
 	end
 end
+
+RegisterNetEvent('esx_aiomenu:sendProximityMessageID')
+AddEventHandler('esx_aiomenu:sendProximityMessageID', function(id, message)
+	local myId = PlayerId()
+	local pid = GetPlayerFromServerId(id)
+	if pid == myId then
+		TriggerEvent('chatMessage', "[ID]" .. "", {0, 153, 204}, "^7 " .. message)
+	elseif GetDistanceBetweenCoords(GetEntityCoords(GetPlayerPed(myId)), GetEntityCoords(GetPlayerPed(pid)), true) < 19.999 then
+		TriggerEvent('chatMessage', "[ID]" .. "", {0, 153, 204}, "^7 " .. message)
+	end
+end)

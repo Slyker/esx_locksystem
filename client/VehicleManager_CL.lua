@@ -50,13 +50,13 @@ function newVehicle()
 				SetVehicleDoorsLocked(self.id, self.lockStatus)
 				SetVehicleDoorsLockedForAllPlayers(self.id, 1)
 				TriggerEvent("esx_locksystem:notify", _U("vehicle_locked"))
-				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock", 1.0)
+				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock", 0.5)
 			elseif(lockStatus > 2)then
 				self.lockStatus = 1
 				SetVehicleDoorsLocked(self.id, self.lockStatus)
 				SetVehicleDoorsLockedForAllPlayers(self.id, false)
 				TriggerEvent("esx_locksystem:notify", _U("vehicle_unlocked"))
-				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "unlock", 1.0)
+				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "unlock", 0.5)
 			end
 		else
 			lockStatus = self.lockStatus
@@ -65,13 +65,13 @@ function newVehicle()
 				SetVehicleDoorsLocked(self.id, self.lockStatus)
 				SetVehicleDoorsLockedForAllPlayers(self.id, 1)
 				TriggerEvent("esx_locksystem:notify", _U("vehicle_locked"))
-				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock2", 0.2)
+				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock2", 0.5)
 			elseif(lockStatus > 2)then
 				self.lockStatus = 1
 				SetVehicleDoorsLocked(self.id, self.lockStatus)
 				SetVehicleDoorsLockedForAllPlayers(self.id, false)
 				TriggerEvent("esx_locksystem:notify", _U("vehicle_unlocked"))
-				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "unlock2", 1.0)
+				TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 10, "lock2", 0.5)
 			end
 		end
     end

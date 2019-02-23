@@ -1,6 +1,6 @@
 resource_manifest_version "05cfa83c-a124-4cfa-a768-c24a5811d8f9"
 
-version '2.2'
+version '3.0'
 
 client_scripts {
     '@es_extended/locale.lua',
@@ -29,8 +29,7 @@ files {
     'client/html/index.html',
     'client/html/sounds/lock.ogg',
     'client/html/sounds/unlock.ogg',
-	'client/html/sounds/lock2.ogg',
-	'client/html/sounds/unlock2.ogg'
+	'client/html/sounds/lock2.ogg'
 }
 
 server_exports {

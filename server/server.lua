@@ -108,31 +108,34 @@ AddEventHandler("esx_locksystem:lockTheVehicle", function(plate)
 end)
 
 RegisterServerEvent("esx_locksystem:haveKeys")
-AddEventHandler("esx_locksystem:haveKeys", function(target, vehPlate, cb)
-    targetIdentifier = GetPlayerIdentifiers(target)[1]
+AddEventHandler("esx_locksystem:haveKeys", function(myID, localVehPlate)
+    targetIdentifier = GetPlayerIdentifiers(myID)[1]
     local hasKey = false
 
     for plate, identifier in pairs(owners) do
-        if(plate == vehPlate and identifier == targetIdentifier)then
+        if(string.gsub(tostring(plate), "%s", "") == localVehPlate and identifier == targetIdentifier)then
+			
             hasKey = true
             break
         end
     end
-    for plate, identifiers in pairs(secondOwners) do
-        if(plate == vehPlate)then
-            for k, plyIdentifier in ipairs(identifiers) do
-                if(plyIdentifier == targetIdentifier)then
-                    hasKey = true
+	for plate, identifiers in pairs(secondOwners) do
+        if(string.gsub(tostring(plate), "%s", "") == localVehPlate)then
+           for k, plyIdentifier in ipairs(identifiers) do
+               if(plyIdentifier == targetIdentifier)then
+                   hasKey = true
                     break
                 end
-            end
-        end
-    end
+			end
+		end
+	end
 
     if hasKey == true then
-        cb(true)
+		callback = true
+		TriggerClientEvent("esx_locksystem:setIsOwner", myID, callback)
     else
-        cb(false)
+		callback = false
+		TriggerClientEvent("esx_locksystem:setIsOwner", myID, callback)
     end
 end)
 
@@ -192,17 +195,12 @@ end)
 if Config.versionChecker then
     PerformHttpRequest("https://raw.githubusercontent.com/ArkSeyonet/esx_locksystem/master/VERSION", function(err, rText, headers)
 		if rText then
-			if tonumber(rText) > tonumber(_VERSION) then
-				print("\n---------------------------------------------------")
-				print("ESX LockSystem has an update available!")
-				print("---------------------------------------------------")
-				print("Current : " .. _VERSION)
-				print("Latest  : " .. rText .. "\n")
-			end
+				if tonumber(rText) > tonumber(_VERSION) then
+					print("[ESX LockSystem] Current Version: " .. _VERSION)
+					print("[ESX LockSystem] Latest Version: " .. rText .. "\n")
+				end
 		else
-			print("\n---------------------------------------------------")
-			print("Unable to find the version.")
-			print("---------------------------------------------------\n")
+			print("[ESX LockSystem] Unable to find the version.")
 		end
 	end, "GET", "", {what = 'this'})
 end
