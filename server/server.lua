@@ -191,16 +191,3 @@ RegisterServerEvent('InteractSound_SV:PlayWithinDistance')
 AddEventHandler('InteractSound_SV:PlayWithinDistance', function(maxDistance, soundFile, soundVolume)
     TriggerClientEvent('InteractSound_CL:PlayWithinDistance', -1, source, maxDistance, soundFile, soundVolume)
 end)
-
-if Config.versionChecker then
-    PerformHttpRequest("https://raw.githubusercontent.com/ArkSeyonet/esx_locksystem/master/VERSION", function(err, rText, headers)
-		if rText then
-				if tonumber(rText) > tonumber(_VERSION) then
-					print("[ESX LockSystem] Current Version: " .. _VERSION)
-					print("[ESX LockSystem] Latest Version: " .. rText .. "\n")
-				end
-		else
-			print("[ESX LockSystem] Unable to find the version.")
-		end
-	end, "GET", "", {what = 'this'})
-end

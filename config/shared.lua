@@ -21,11 +21,8 @@ local Keys = {
 	["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
 }
 
-_VERSION = "3.0"
-
 Config = {
 	Locale = "en",
-	versionChecker = true,			-- Set to false for disable the version checker
 	enableGiveKey = true,			-- Enable or disable the /givekey chatCommand
 	percentage = 100,				-- Percentage chance of finding keys
 	notification = 1,				-- 0 = Disable | 1 = LockSystem notification | 2 = chatMessage notification
