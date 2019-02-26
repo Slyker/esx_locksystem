@@ -7,22 +7,24 @@
         <script src="scripts/sounds.js" type="text/javascript"></script>
         <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
 		
-        <script>
-            var audioPlayer = null;
-            window.addEventListener('message', function(event) {
-                if (event.data.transactionType == "playSound") {
-				
-                  if (audioPlayer != null) {
-                    audioPlayer.pause();
-                  }
 
-                  audioPlayer = new Audio("./sounds/" + event.data.transactionFile + ".ogg");
-                  audioPlayer.volume = event.data.transactionVolume;
-                  audioPlayer.play();
+    <script>
+        document.onkeydown = function (data) {
+            if (data.which == '27' || '42') { // Escape key
+                $('#keyfob').css('display', 'none');
+                $('#car-disconnected').css('display', 'none');
+                $('#car-connected').css('display', 'none');
+                $('#engine-off').css('display', 'none');
+                $('#engine-on').css('display', 'none');
+                $('#unlocked').css('display', 'none');
+                $('#locked').css('display', 'none');
+                $.post('http://esx_locksystem/NUIFocusOff', JSON.stringify({}));
+                // this.post('http://esx_locksystem/NUIFocusOff', JSON.stringify({}));
+            }
+        }
 
-                }
-            });
-        </script>
+        // document.getElementById("#keyfob").style.display == "block"
+    </script>
 
     </head>
 
@@ -108,18 +110,6 @@
                     if (event.data.type == "openKeyFob") {
                         $('#keyfob').css('display', 'block');
                     }
-
-                    // Close Key Fob
-                    else if (event.data.type == "closeAll") {
-                        $('#keyfob').css('display', 'none');
-                        $('#car-disconnected').css('display', 'none');
-                        $('#car-connected').css('display', 'none');
-                        $('#engine-off').css('display', 'none');
-                        $('#engine-on').css('display', 'none');
-                        $('#unlocked').css('display', 'none');
-                        $('#locked').css('display', 'none');
-
-                    }
                     
                     // Updates the status indicators on the Key Fob
                     else if (event.data.type == "carConnected") {
@@ -162,36 +152,36 @@
 
                     // Buttons
                     $("#button-lock").click(function(){
-                        $.post('http://esx_locksystem/NUIlock', JSON.stringify({}));
+                        $.post('http://esx_locksystem/NUILock', JSON.stringify({}));
                     });
 
                     $("#button-lock").dblclick(function(){
                         $.post('http://esx_locksystem/NUInotSupported', JSON.stringify({}));
                     });
 
-                    $("#button-unlock").click(function(){
-                        $.post('http://esx_locksystem/NUIunlock', JSON.stringify({}));
-                    });
+                    // $("#button-unlock").click(function(){
+                    //     $.post('http://esx_locksystem/NUIunlock', JSON.stringify({}));
+                    // });
 
-                    $("#button-unlock").dblclick(function(){
-                        $.post('http://esx_locksystem/NUInotSupported', JSON.stringify({}));
-                    });
+                    // $("#button-unlock").dblclick(function(){
+                    //     $.post('http://esx_locksystem/NUInotSupported', JSON.stringify({}));
+                    // });
 
-                    $("#button-start").click(function(){
-                        $.post('http://esx_locksystem/NUInotSupported', JSON.stringify({}));
-                    });
+                    // $("#button-start").click(function(){
+                    //     $.post('http://esx_locksystem/NUInotSupported', JSON.stringify({}));
+                    // });
 
-                    $("#button-start").dblclick(function(){
-                        $.post('http://esx_locksystem/NUItoggleEngine', JSON.stringify({}));
-                    });
+                    // $("#button-start").dblclick(function(){
+                    //     $.post('http://esx_locksystem/NUItoggleEngine', JSON.stringify({}));
+                    // });
 
-                    $("#button-aux").click(function(){
-                        $.post('http://esx_locksystem/NUIopenTrunk', JSON.stringify({}));
-                    });
+                    // $("#button-aux").click(function(){
+                    //     $.post('http://esx_locksystem/NUIopenTrunk', JSON.stringify({}));
+                    // });
 
-                    $("#button-aux").dblclick(function(){
-                        $.post('http://esx_locksystem/NUItoggleAlarm', JSON.stringify({}));
-                    });
+                    // $("#button-aux").dblclick(function(){
+                    //     $.post('http://esx_locksystem/NUItoggleAlarm', JSON.stringify({}));
+                    // });
 
 
                 });

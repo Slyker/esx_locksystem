@@ -18,6 +18,11 @@ Config = {
 	notification = 1,				-- 0 = Disable | 1 = LockSystem notification | 2 = chatMessage notification
 	lockTimer = 1,					-- Timer between two changes (open/close - in seconds)
 	useKeyFob = false,				-- Enable or disable the Key Fob GUI
+	maxAlarmDist = 10, 				-- Set max distance the alarm audio can be heard from
+	maxAlarmVol = .25, 				-- Set max volume for the alarm audio
+	maxFobBeepDist = 10, 			-- Set max distance the fob beep audio can be heard from
+	maxFobBeepVol = .25, 			-- Set max volume for the fob beep audio
+	disableCar_NPC = true,
 	randomMsg =	{
 			"You found an extra set of keys in the glove compartment.",
 			"You found an extra set of keys in the center console.",

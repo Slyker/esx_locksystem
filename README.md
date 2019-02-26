@@ -10,12 +10,12 @@ Modified Version Of ESX LockSystem
 
 ## Installation
 
-1) Download the [latest release](https://github.com/ArkSeyonet/esx_locksystem/releases/latest).
+1) Install To resources/[esx]/esx_locksystem
 
-2) Unzip download in the `resources/[esx]/esx_locksystem` directory.
-
-3) Add `start esx_locksystem` in your server.cfg.
-
+2) Add this in your server.cfg :
+```
+start esx_locksystem
+```
 For help with ESX AIOMenu, the new version of ESX Identity, or the new version of ESX Locksystem, please join the discord via this link: https://discord.gg/3ECcWxn
 
 ## Credits

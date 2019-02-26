@@ -6,8 +6,7 @@ client_scripts {
     '@es_extended/locale.lua',
     "config/shared.lua",
     "client/client.lua",
-    'locales/en.lua',
-    'locales/pl.lua'
+    'locales/en.lua'
 }
 
 server_scripts {
@@ -15,8 +14,7 @@ server_scripts {
 	'@mysql-async/lib/MySQL.lua',
     "config/shared.lua",
     "server/server.lua",
-    'locales/en.lua',
-    'locales/pl.lua'
+    'locales/en.lua'
 }
 
 dependency 'es_extended'
@@ -26,17 +24,14 @@ ui_page 'client/html/ui.html'
 files {
     'client/html/ui.html',
     'client/html/css/ui.css',
-    'client/html/scripts/ui.js',
     'client/html/images/keyfob_viper.png',
     'client/html/sounds/lock.ogg',
+	'client/html/sounds/lock2.ogg',
     'client/html/sounds/unlock.ogg',
-	'client/html/sounds/lock2.ogg'
+    'client/html/sounds/unlock2.ogg',
+    'client/html/sounds/beep.ogg'
 }
 
 exports {
   'doLockSystemToggleLocks'
-}
-
-server_exports {
-	'newVehicle'
 }
