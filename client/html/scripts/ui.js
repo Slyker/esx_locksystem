@@ -1,13 +1,14 @@
+let keyFobKey;
 
 // Callback to client.lua
 function httpPost(event, data) {
     const xhr = new XMLHttpRequest(); 
-    xhr.open("POST", "http://esx_locksystem/" + event, true);
+    xhr.open("POST", "http://esx_locksystem/" + event, true); //FIXME: true=async you may need to set this both ways. it may help with timing.
     xhr.send(JSON.stringify({data}));
 }
 
 document.onkeydown = function (data) {
-    if (data.which == '27' || '42') { // Escape key 
+    if (data.which == '42' || '27') { // Escape key 
         document.getElementById("keyfob").style.display = 'none';
         document.getElementById("carDisconnected").style.display = 'none';
         document.getElementById("carConnected").style.display = 'none';
@@ -17,10 +18,10 @@ document.onkeydown = function (data) {
         document.getElementById("locked").style.display = 'none';
         httpPost("NUIFocusOff");
     }
-}
+};
 
 
-/* open the UI for user */
+// Listens for messages from the client and updates the status
 window.addEventListener('message', function(event) {
 
     // Open Key Fob
@@ -60,11 +61,14 @@ window.addEventListener('message', function(event) {
         document.getElementById("buttonStart").disabled = true;
         document.getElementById("buttonLock").disabled = true;
         document.getElementById("buttonUnlocked").disabled = true;
+        document.getElementById("buttonAux").disabled = true;
         
     } else if (event.data.type == "enableButtons") {
         document.getElementById("buttonStart").disabled = false;
         document.getElementById("buttonLock").disabled = false;
         document.getElementById("buttonUnlocked").disabled = false;
+        document.getElementById("buttonAux").disabled = true;
+
 // FIXME: NOT WORKING ABOVE        
     } else if (event.data.type == "closeAll") {
         document.getElementById("keyfob").style.display = 'none';
@@ -79,5 +83,3 @@ window.addEventListener('message', function(event) {
 
 
 });
-
-// FIXME: Errors in console. Clicking the lock button is triggering the NUIUnlock functions, and nothing else is working.
