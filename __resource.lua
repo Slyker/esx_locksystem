@@ -1,6 +1,6 @@
 resource_manifest_version "05cfa83c-a124-4cfa-a768-c24a5811d8f9"
 
-version '3.1REVAMP (DEV)'
+version '4.0_PRE'
 
 client_scripts {
     '@es_extended/locale.lua',
