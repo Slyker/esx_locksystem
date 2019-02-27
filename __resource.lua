@@ -5,16 +5,14 @@ version '3.1REVAMP (DEV)'
 client_scripts {
     '@es_extended/locale.lua',
     "config/shared.lua",
-    "client/client.lua",
-    'locales/en.lua'
+    "client/client.lua"
 }
 
 server_scripts {
     '@es_extended/locale.lua',
 	'@mysql-async/lib/MySQL.lua',
     "config/shared.lua",
-    "server/server.lua",
-    'locales/en.lua'
+    "server/server.lua"
 }
 
 dependency 'es_extended'

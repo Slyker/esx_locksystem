@@ -64,6 +64,8 @@ html, body {
 	left: 35px;
 }
 
+#button-lock:focus {outline:0 !important;}
+
 #button-unlock {
 	background-color: transparent;
 	border-color: transparent;
@@ -73,6 +75,7 @@ html, body {
 	top: 236px;
 	left: 99px;
 }
+#button-unlock:focus {outline:0 !important;}
 
 #button-aux {
 	background-color: transparent;

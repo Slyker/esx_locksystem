@@ -8,6 +8,8 @@ savedVehicle	= 0
 keyFobOpen 		= false
 engine 			= nil
 menuOpen 		= false
+times			= 0
+owner 			= false
 
 -----------------------------------------------------------------------------------------
 ---                                        EVENTS                                     ---
@@ -27,11 +29,6 @@ AddEventHandler("esx_locksystem:newVehicle", function(plate, id, lockStatus)
     end
 end)
 
-RegisterNetEvent('esx_locksystem:notify')
-AddEventHandler('esx_locksystem:notify', function(text, duration)
-	Notify(text, duration)
-end)
-
 -----------------------------------------------------------------------------------------
 ---                                        NUI                                        ---
 -----------------------------------------------------------------------------------------
@@ -43,96 +40,306 @@ end)
 
 RegisterNUICallback('NUILock', function()
 	if time > timer then
-		SendNUIMessage({type = 'closeAll'})
-		local ownedCheck = checkOwner()
-		Wait(1000)
-
-		if ownedCheck then
+		if owner then
 			local ply = GetPlayerPed(-1)
 			local localVehLockStatus = GetVehicleDoorLockStatus(localVehId)
 			if localVehLockStatus < 2 then
-				lockVehicle(ply, localVehId)
+				lockVehicleKeyFob(ply, localVehId)
 			else
-				TriggerEvent("esx_locksystem:notify", _U("already_locked"), 0.060)
+				ESX.ShowNotification('This vehicle is already locked.') 
+				SendNUIMessage({type = 'carConnected'})
+				SendNUIMessage({type = 'locked'})
 			end
 		else
-			TriggerEvent("esx_locksystem:notify", _U("not_owned"), 0.060)
+			ESX.ShowNotification('You don\'t own this vehicle.') 
+			SendNUIMessage({type = 'enableButtons'})
 		end
 	else
-		TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
+		ESX.ShowNotification('You have to wait ' .. ((Config.lockTimer - time) + 0.1) .. ' more seconds.') 
+		SendNUIMessage({type = 'enableButtons'})
 	end
 end)
 
 RegisterNUICallback('NUIUnlock', function()
 	if time > timer then
-		SendNUIMessage({type = 'closeAll'})
-		local ownedCheck = checkOwner()
-		Wait(1000)
-
-		if ownedCheck then
+		if owner then
 			local ply = GetPlayerPed(-1)
 			local localVehLockStatus = GetVehicleDoorLockStatus(localVehId)
 			if localVehLockStatus >= 2 then
-				unlockVehicle(ply, localVehId)
+				unlockVehicleKeyFob(ply, localVehId)
 			else
-				TriggerEvent("esx_locksystem:notify", _U("already_unlocked"), 0.060)
+				ESX.ShowNotification('This vehicle is already unlocked.') 
+				SendNUIMessage({type = 'carConnected'})
+				SendNUIMessage({type = 'unlocked'})
 			end
 		else
-			TriggerEvent("esx_locksystem:notify", _U("not_owned"), 0.060)
+			ESX.ShowNotification('You don\'t own this vehicle.') 
+			SendNUIMessage({type = 'enableButtons'})
 		end
 	else
-		TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
+		ESX.ShowNotification('You have to wait ' .. ((Config.lockTimer - time) + 0.1) .. ' more seconds.') 
+		SendNUIMessage({type = 'enableButtons'})
 	end
 end)
 
 RegisterNUICallback('NUIToggleEngine', function()
 	if time > timer then
-		SendNUIMessage({type = 'closeAll'})
-		local ownedCheck = checkOwner()
-		Wait(1000)
-
-		if ownedCheck then
-			local ply = GetPlayerPed(-1)
-			if engine == nil then
-				engine = GetIsVehicleEngineRunning(localVehId)
-			end
-
-			if engine == true then
-				local lib = "anim@mp_player_intmenu@key_fob@"
-				local anim = "fob_click"
-
-				ESX.Streaming.RequestAnimDict(lib, function()
-					TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
-				end)
-				engine = false
-				Wait(250)
-				TriggerEvent("esx_locksystem:notify", _U("engine_off"), 0.060)
-				SetVehicleEngineOn(localVehId, false, false, false)
-			else
-				local lib = "anim@mp_player_intmenu@key_fob@"
-				local anim = "fob_click"
-				engine = true
-				ESX.Streaming.RequestAnimDict(lib, function()
-					TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
-				end)
-	
-				Wait(250)
-				SetVehicleEngineOn(localVehId, true, true, false)
-				TriggerEvent("esx_locksystem:notify", _U("engine_on"), 0.060)
-			end
-		else
-			TriggerEvent("esx_locksystem:notify", _U("not_owned"), 0.060)
-		end
-
-		time = 0
+		SendNUIMessage({type = 'disableButtons'})
+		toggleEnginesKeyFob()
 	else
-		TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
+		ESX.ShowNotification('You have to wait ' .. ((Config.lockTimer - time) + 0.1) .. ' more seconds.') 
 	end
 end)
 
 -----------------------------------------------------------------------------------------
 ---                                     FUNCTIONS                                     ---
 -----------------------------------------------------------------------------------------
+
+---------------------------------------- KEYFOB -----------------------------------------
+
+function toggleEnginesKeyFob()
+	local ply = GetPlayerPed(-1)
+
+	if owner then
+		if time > timer then
+			if (engine ~= nil) and (engine == true or engine == 1) then
+				time = 0
+				ClearPedTasks(ply)
+				playAnimation()
+				Wait(250)
+
+				ESX.ShowNotification('Engine is now off.') 
+				ESX.ShowNotification('Repeated ' .. tostring(times) .. ' times.') 
+				times = times + 1
+				SetVehicleEngineOn(localVehId, false, false, false)
+				engine = false
+					SendNUIMessage({type = 'carConnected'})
+					SendNUIMessage({type = 'engineOff'})
+					SendNUIMessage({type = 'enableButtons'})
+			else
+				time = 0
+				ClearPedTasks(ply)
+				playAnimation()
+				Wait(250)
+
+				SetVehicleEngineOn(localVehId, true, true, false)
+				ESX.ShowNotification('Engine is now on.') 
+				ESX.ShowNotification('Repeated ' .. tostring(times) .. ' times.') 
+				times = times + 1
+				engine = true
+					SendNUIMessage({type = 'carConnected'})
+					SendNUIMessage({type = 'engineOn'})
+					SendNUIMessage({type = 'enableButtons'})
+			end
+		else
+			ESX.ShowNotification('You have to wait ' .. ((Config.lockTimer - time) + 0.1) .. ' more seconds.') 
+				SendNUIMessage({type = 'enableButtons'})
+		end
+	else
+		ESX.ShowNotification('You don\'t own this vehicle or the vehicle wasn\'t found.')
+			SendNUIMessage({type = 'enableButtons'})
+	end
+end
+
+function lockVehicleKeyFob(ply, localVehId)
+	if time > timer then
+		if(IsPedInAnyVehicle(ply, true))then
+			SetVehicleDoorsLocked(localVehId, 4)
+			SetVehicleDoorsLockedForAllPlayers(localVehId, 1)
+			RollUpWindow(localVehId, 0)
+			RollUpWindow(localVehId, 1)
+			RollUpWindow(localVehId, 2)
+			RollUpWindow(localVehId, 3)
+			ESX.ShowNotification('This vehicle was locked.') 
+			local vehicleNetId = getVehicleNetId(localVehId)
+			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
+				SendNUIMessage({type = 'carConnected'})
+				SendNUIMessage({type = 'locked'})
+		else
+			playAnimation()
+			Wait(250)
+
+			SetVehicleDoorsLocked(localVehId, 4)
+			SetVehicleDoorsLockedForAllPlayers(localVehId, 1)
+			RollUpWindow(localVehId, 0)
+			RollUpWindow(localVehId, 1)
+			RollUpWindow(localVehId, 2)
+			RollUpWindow(localVehId, 3)
+			ESX.ShowNotification('This vehicle was locked.') 
+			local vehicleNetId = getVehicleNetId(localVehId)
+			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
+				SendNUIMessage({type = 'carConnected'})
+				SendNUIMessage({type = 'locked'})
+		end
+
+		time = 0
+	else
+		ESX.ShowNotification('You have to wait ' .. ((Config.lockTimer - time) + 0.1) .. ' more seconds.') 
+			SendNUIMessage({type = 'enableButtons'})
+	end
+end
+
+function unlockVehicleKeyFob(ply, localVehId)
+	if time > timer then
+		if(IsPedInAnyVehicle(ply, true))then
+			SetVehicleDoorsLocked(localVehId, 1)
+			SetVehicleDoorsLockedForAllPlayers(localVehId, 0)
+			RollUpWindow(localVehId, 0)
+			RollUpWindow(localVehId, 1)
+			RollUpWindow(localVehId, 2)
+			RollUpWindow(localVehId, 3)
+			local vehicleNetId = getVehicleNetId(localVehId)
+			ESX.ShowNotification('This vehicle was unlocked.')
+			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
+				SendNUIMessage({type = 'carConnected'})
+				SendNUIMessage({type = 'unlocked'})
+		else
+
+			playAnimation()
+			Wait(250)
+
+			SetVehicleDoorsLocked(localVehId, 1)
+			SetVehicleDoorsLockedForAllPlayers(localVehId, 0)
+			RollUpWindow(localVehId, 0)
+			RollUpWindow(localVehId, 1)
+			RollUpWindow(localVehId, 2)
+			RollUpWindow(localVehId, 3)
+			ESX.ShowNotification('This vehicle was unlocked.') 
+			local vehicleNetId = getVehicleNetId(localVehId)
+			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
+				SendNUIMessage({type = 'carConnected'})
+				SendNUIMessage({type = 'unlocked'})
+		end
+
+		time = 0
+	else
+		ESX.ShowNotification('You have to wait ' .. ((Config.lockTimer - time) + 0.1) .. ' more seconds.') 
+			SendNUIMessage({type = 'enableButtons'})
+	end
+end
+
+-------------------------------------- NON KEYFOB ---------------------------------------
+
+function toggleEngines()
+	local ply = GetPlayerPed(-1)
+	checkOwner()
+	Wait(1000)
+
+	if owner then
+		if time > timer then
+			if (engine ~= nil) and (engine == true or engine == 1) then
+				time = 0
+				ClearPedTasks(ply)
+				playAnimation()
+				Wait(250)
+
+				ESX.ShowNotification('Engine is now off.') 
+				SetVehicleEngineOn(localVehId, false, false, false)
+				engine = false
+			else
+				time = 0
+				ClearPedTasks(ply)
+				playAnimation()
+				Wait(250)
+
+				SetVehicleEngineOn(localVehId, true, true, false)
+				ESX.ShowNotification('Engine is now on.') 
+				engine = true
+			end
+		else
+			ESX.ShowNotification('You have to wait ' .. ((Config.lockTimer - time) + 0.1) .. ' more seconds.') 
+		end
+	else
+		ESX.ShowNotification('You don\'t own this vehicle or the vehicle wasn\'t found.')
+	end
+end
+
+function toggleLocks()
+
+	local ply = GetPlayerPed(-1)
+	checkOwner()
+	Wait(1000)
+
+	if owner then
+		lockStatus = GetVehicleDoorLockStatus(localVehId)
+		if lockStatus < 2 then
+			lockVehicle(ply, localVehId)
+		else
+			unlockVehicle(ply, localVehId)
+		end
+	else
+		ESX.ShowNotification('You don\'t own this vehicle or the vehicle wasn\'t found.')
+	end
+end
+
+function lockVehicle(ply, localVehId)
+	if time > timer then
+		if(IsPedInAnyVehicle(ply, true))then
+			SetVehicleDoorsLocked(localVehId, 4)
+			SetVehicleDoorsLockedForAllPlayers(localVehId, 1)
+			RollUpWindow(localVehId, 0)
+			RollUpWindow(localVehId, 1)
+			RollUpWindow(localVehId, 2)
+			RollUpWindow(localVehId, 3)
+			ESX.ShowNotification('This vehicle was locked.') 
+			local vehicleNetId = getVehicleNetId(localVehId)
+			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
+		else
+			playAnimation()
+			Wait(250)
+
+			SetVehicleDoorsLocked(localVehId, 4)
+			SetVehicleDoorsLockedForAllPlayers(localVehId, 1)
+			RollUpWindow(localVehId, 0)
+			RollUpWindow(localVehId, 1)
+			RollUpWindow(localVehId, 2)
+			RollUpWindow(localVehId, 3)
+			ESX.ShowNotification('This vehicle was locked.') 
+			local vehicleNetId = getVehicleNetId(localVehId)
+			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
+		end
+
+		time = 0
+	else
+		ESX.ShowNotification('You have to wait ' .. ((Config.lockTimer - time) + 0.1) .. ' more seconds.') 
+	end
+end
+
+function unlockVehicle(ply, localVehId)
+	if time > timer then
+		if(IsPedInAnyVehicle(ply, true))then
+			SetVehicleDoorsLocked(localVehId, 1)
+			SetVehicleDoorsLockedForAllPlayers(localVehId, 0)
+			RollUpWindow(localVehId, 0)
+			RollUpWindow(localVehId, 1)
+			RollUpWindow(localVehId, 2)
+			RollUpWindow(localVehId, 3)
+			local vehicleNetId = getVehicleNetId(localVehId)
+			ESX.ShowNotification('This vehicle was unlocked.')
+			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
+		else
+
+			playAnimation()
+			Wait(250)
+
+			SetVehicleDoorsLocked(localVehId, 1)
+			SetVehicleDoorsLockedForAllPlayers(localVehId, 0)
+			RollUpWindow(localVehId, 0)
+			RollUpWindow(localVehId, 1)
+			RollUpWindow(localVehId, 2)
+			RollUpWindow(localVehId, 3)
+			ESX.ShowNotification('This vehicle was unlocked.') 
+			local vehicleNetId = getVehicleNetId(localVehId)
+			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
+		end
+
+		time = 0
+	else
+		ESX.ShowNotification('You have to wait ' .. ((Config.lockTimer - time) + 0.1) .. ' more seconds.') 
+	end
+end
+
+---------------------------------------- GENERAL ----------------------------------------
 
 -- Get Vehicle's Net Id
 function getVehicleNetId(vehID)
@@ -171,39 +378,16 @@ function getRandomMsg()
     return Config.randomMsg[msgNb]
 end
 
-function Notify(text, duration)
-	if(Config.notification)then
-		if(Config.notification == 1)then
-			if(not duration)then
-				duration = 0.080
-			end
-			SetNotificationTextEntry("STRING")
-			AddTextComponentString(text)
-			Citizen.InvokeNative(0x1E6611149DB3DB6B, "CHAR_LIFEINVADER", "CHAR_LIFEINVADER", true, 1, "ESX LockSystem", "", duration)
-			DrawNotification_4(false, true)
-		elseif(Config.notification == 2)then
-			TriggerEvent('chatMessage', '^1ESX LockSystem' .. _VERSION, {255, 255, 255}, text)
-		else
-			return
-		end
-	else
-		return
-	end
-end
-
 function checkOwner()
 	local ply = GetPlayerPed(-1)
 	local coordA = GetEntityCoords(ply, 1)
 	local coordB = GetOffsetFromEntityInWorldCoords(ply, 0.0, 5.0, 0.0)
 	local vehicle = getVehicleInDirection(coordA, coordB)
-	local hasKey = false
 	local myID = GetPlayerServerId(PlayerId())
-	local owned = false
 	isInside = false
 	
 	if(IsPedInAnyVehicle(ply, true))then
 		localVehId = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-		isInside = true
 	else
 		if (vehicle ~= 0) then	
 			localVehId = vehicle
@@ -229,140 +413,41 @@ function checkOwner()
 				local plateCheck = string.gsub(tostring(plate), "%s", "")
 				local localVehPlateCheck = string.gsub(tostring(localVehPlate), "%s", "")
 				if plateCheck == localVehPlateCheck then
-					owned = true
-					time = 0
-					break
+					owner = true
+					break 
 				end
 			end
 
-			if owned == true then
-				return true
+			if owner then
 			else
 				savedVehicle = 0
-				return false
 			end
 		else
-			TriggerEvent("esx_locksystem:notify", _U("could_not_find_plate"))
+			ESX.ShowNotification('Could not find the plates.') 
 		end
 	end
 end
 
-function lockVehicle(ply, localVehId)
-	if time > timer then
-		if(IsPedInAnyVehicle(ply, true))then
-			SetVehicleDoorsLocked(localVehId, 4)
-			SetVehicleDoorsLockedForAllPlayers(localVehId, 1)
-			RollUpWindow(localVehId, 0)
-			RollUpWindow(localVehId, 1)
-			RollUpWindow(localVehId, 2)
-			RollUpWindow(localVehId, 3)
-			local vehicleNetId = getVehicleNetId(localVehId)
-			TriggerEvent("esx_locksystem:notify", _U("vehicle_locked"))
+function playAnimation()
+	local ply = GetPlayerPed(-1)
+	local lib = "anim@mp_player_intmenu@key_fob@"
+	local anim = "fob_click"
 
-			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
-		else
-			local lib = "anim@mp_player_intmenu@key_fob@"
-			local anim = "fob_click"
-
-			ESX.Streaming.RequestAnimDict(lib, function()
-				TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
-			end)
-
-			Wait(250)
-
-			SetVehicleDoorsLocked(localVehId, 4)
-			SetVehicleDoorsLockedForAllPlayers(localVehId, 1)
-			RollUpWindow(localVehId, 0)
-			RollUpWindow(localVehId, 1)
-			RollUpWindow(localVehId, 2)
-			RollUpWindow(localVehId, 3)
-			TriggerEvent("esx_locksystem:notify", _U("vehicle_locked"))
-			local vehicleNetId = getVehicleNetId(localVehId)
-			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
-		end
-
-		time = 0
-	else
-		TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
-	end
+	ESX.Streaming.RequestAnimDict(lib, function()
+		TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
+	end)
 end
-
-function unlockVehicle(ply, localVehId)
-	if time > timer then
-		if(IsPedInAnyVehicle(ply, true))then
-			SetVehicleDoorsLocked(localVehId, 1)
-			SetVehicleDoorsLockedForAllPlayers(localVehId, 0)
-			RollUpWindow(localVehId, 0)
-			RollUpWindow(localVehId, 1)
-			RollUpWindow(localVehId, 2)
-			RollUpWindow(localVehId, 3)
-			local vehicleNetId = getVehicleNetId(localVehId)
-			TriggerEvent("esx_locksystem:notify", _U("vehicle_unlocked"))
-
-			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
-		else
-			local lib = "anim@mp_player_intmenu@key_fob@"
-			local anim = "fob_click"
-
-			ESX.Streaming.RequestAnimDict(lib, function()
-				TaskPlayAnim(ply, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
-			end)
-
-			Wait(250)
-
-			SetVehicleDoorsLocked(localVehId, 1)
-			SetVehicleDoorsLockedForAllPlayers(localVehId, 0)
-			RollUpWindow(localVehId, 0)
-			RollUpWindow(localVehId, 1)
-			RollUpWindow(localVehId, 2)
-			RollUpWindow(localVehId, 3)
-			TriggerEvent("esx_locksystem:notify", _U("vehicle_unlocked"))
-			local vehicleNetId = getVehicleNetId(localVehId)
-			-- TriggerServerEvent("InteractSound_SV:PlayWithinDistanceToVehicle", Config.maxAlarmDist, "lock2", Config.maxAlarmVol, vehicleNetId)
-		end
-		time = 0
-	else
-		TriggerEvent("esx_locksystem:notify", _U("lock_cooldown", (timer / 1000)))
-	end
-end
-
 -----------------------------------------------------------------------------------------
 ---                                      THREADS                                      ---
 -----------------------------------------------------------------------------------------
 
 -- Timer
 Citizen.CreateThread(function()
-    timer = Config.lockTimer * 1000
+    timer = Config.lockTimer
     time = 0
 	while true do
 		Wait(1000)
-		time = time + 1000
-	end
-end)
-
-Citizen.CreateThread(function()
-	while true do
-		Wait(100)
-		if menuOpen then
-			DisableControlAction(0,21,true) -- disable sprint
-			DisableControlAction(0,24,true) -- disable attack
-			DisableControlAction(0,25,true) -- disable aim
-			DisableControlAction(0,47,true) -- disable weapon
-			DisableControlAction(0,58,true) -- disable weapon
-			DisableControlAction(0,263,true) -- disable melee
-			DisableControlAction(0,264,true) -- disable melee
-			DisableControlAction(0,257,true) -- disable melee
-			DisableControlAction(0,140,true) -- disable melee
-			DisableControlAction(0,141,true) -- disable melee
-			DisableControlAction(0,142,true) -- disable melee
-			DisableControlAction(0,143,true) -- disable melee
-			DisableControlAction(0,75,true) -- disable exit vehicle
-			DisableControlAction(27,75,true) -- disable exit vehicle
-			DisableControlAction(0,32,true) -- move (w)
-			DisableControlAction(0,34,true) -- move (a)
-			DisableControlAction(0,33,true) -- move (s)
-			DisableControlAction(0,35,true) -- move (d)
-		end
+		time = time + 1
 	end
 end)
 
@@ -405,80 +490,86 @@ end)
 -- MAIN THREAD 1
 Citizen.CreateThread(function()
 	while true do
-		Wait(5000)
+		Wait(1000)
 		TriggerServerEvent("esx_locksystem:retrieveVehiclesOnconnect")
-		Wait(25000)
+		Wait(29000)
 	end
 end)
 
 -- MAIN THREAD 2
-Citizen.CreateThread(function()
+if Config.useKeyFob then
+	Citizen.CreateThread(function()
 
-	while ESX == nil do
-		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-		Citizen.Wait(0)
-	end
+		while ESX == nil do
+			TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+			Citizen.Wait(0)
+		end
 
-    while true do
-        Wait(0)
+		while true do
+			Wait(0)
 
-		if(IsControlJustPressed(1, Config.hotkey))then
-			if Config.useKeyFob then
-				if savedVehicle ~= 0 then
-					SendNUIMessage({type = 'carConnected'})
-					local engine = GetIsVehicleEngineRunning(savedVehicle)
+			if(IsControlJustPressed(1, Config.hotkey))then
+				checkOwner()
+				Wait(1000)
+					if savedVehicle ~= 0 then
+						SendNUIMessage({type = 'carConnected'})
+						local engine = GetIsVehicleEngineRunning(savedVehicle)
 
-					if engine ~= nil then
-						if engine == true then
-							SendNUIMessage({type = 'engineOn'})
+							if ((engine == true) or (engine == 1)) then
+								SendNUIMessage({type = 'engineOn'})
+							else
+								SendNUIMessage({type = 'engineOff'})
+							end
+
+						local lock = GetVehicleDoorLockStatus(savedVehicle)
+
+						if lock ~= nil then
+							if lock < 2 then
+								SendNUIMessage({type = 'unlocked'})
+							else
+								SendNUIMessage({type = 'locked'})
+							end
 						else
-							SendNUIMessage({type = 'engineOff'})
+							SendNUIMessage({type = 'unlocked'})
 						end
 					else
+						SendNUIMessage({type = 'carDisconnected'})
+						SendNUIMessage({type = 'unlocked'})
 						SendNUIMessage({type = 'engineOff'})
 					end
 
-					local lock = GetVehicleDoorLockStatus(savedVehicle)
+					Wait(100)
+					SetNuiFocus(true, true)
+					SendNUIMessage({type = 'enableButtons'})
+					SendNUIMessage({type = 'openKeyFob'})
 
-					if lock ~= nil then
-						if lock < 2 then
-							SendNUIMessage({type = 'unlocked'})
-						else
-							SendNUIMessage({type = 'locked'})
-						end
-					else
-						SendNUIMessage({type = 'unlocked'})
-					end
-				else
-					SendNUIMessage({type = 'carDisconnected'})
-					SendNUIMessage({type = 'unlocked'})
-					SendNUIMessage({type = 'engineOff'})
-				end
-
-				menuOpen = true
-
-				Wait(100)
-				SetNuiFocus(true, true)
-				SendNUIMessage({type = 'openKeyFob'})
-			else
-				local ownedCheck = checkOwner()
-				Wait(1000)
-				if ownedCheck then
-					local ply = GetPlayerPed(-1)
-					local localVehLockStatus = GetVehicleDoorLockStatus(localVehId)
-					if localVehLockStatus < 2 then
-						lockVehicle(ply, localVehId)
-					else
-						unlockVehicle(ply, localVehId)
-					end
-					TriggerEvent("esx_locksystem:notify", _U("owned"))
-				else
-					TriggerEvent("esx_locksystem:notify", _U("not_owned"))
-				end
 			end
-        end
-    end
-end)
+		end
+	end)
+else
+	Citizen.CreateThread(function()
+
+		while ESX == nil do
+			TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+			Citizen.Wait(0)
+		end
+
+		while true do
+			Wait(0)
+
+			if(IsControlJustPressed(1, Config.hotkey))then		
+				toggleLocks()
+			end
+			
+
+
+			if(IsControlJustPressed(1, Config.hotkey2))then
+					toggleEngines()
+			end
+		end
+	end)
+end
+
 
 -- -----------------------------------------------------------------------------------------
 -- ---                                       AUDIO                                       ---
