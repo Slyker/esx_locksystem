@@ -6,24 +6,25 @@ Modified Version Of ESX LockSystem
 ## Requirements
 * [es_extended](https://github.com/ESX-Org/es_extended)
 
+
 ## Installation
 
-1) Install To resources/[esx]/esx_locksystem
+1) Download the [latest release](https://github.com/ArkSeyonet/esx_locksystem/releases/latest).
 
-2) Add this in your server.cfg :
-```
-start esx_locksystem
-```
+2) Unzip download to the `resources/[esx]/esx_locksystem` directory.
+
+3) Add `start esx_locksystem` in your server.cfg.
+
 For help with ESX AIOMenu, the new version of ESX Identity, or the new version of ESX Locksystem, please join the discord via this link: https://discord.gg/3ECcWxn
 
 ## Credits
-* Lead Coder: ArkSeyonet (Github: ArkSeyonet)
-* Coder 1: JustWeb (Github: justweb1)
+* Lead Coder: [ArkSeyonet](https://github.com/ArkSeyonet)
+* Coder 1: [JustWeb](https://github.com/justweb1)
 
 * Special thanks to the original creator of the script, Deediezi. His script can be found here:
 [FiveM_Locksystem](https://forum.fivem.net/t/release-locksystem-3-1-updated-the-07-16-2018-beta/17750)
-* Special thanks to the person who originally converted the script to ESX, xseba360. His script can be found here:
-[ESX_Locksystem] (https://github.com/Xseba360/esx_locksystem)
+* Special thanks to the person who originally converted the script to ESX, [xseba360](https://github.com/Xseba360). His script can be found here:
+[ESX_Locksystem](https://github.com/Xseba360/esx_locksystem)
 
 ## Licensing
 
