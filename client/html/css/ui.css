@@ -54,7 +54,7 @@ html, body {
 	cursor: default;
 }
 
-#button-lock {
+#buttonLock {
 	background-color: transparent;
 	border-color: transparent;
 	position: absolute;
@@ -64,9 +64,9 @@ html, body {
 	left: 35px;
 }
 
-#button-lock:focus {outline:0 !important;}
+#buttonLock:focus {outline:0 !important;}
 
-#button-unlock {
+#buttonUnlock {
 	background-color: transparent;
 	border-color: transparent;
 	position: absolute;
@@ -75,9 +75,9 @@ html, body {
 	top: 236px;
 	left: 99px;
 }
-#button-unlock:focus {outline:0 !important;}
+#buttonUnlock:focus {outline:0 !important;}
 
-#button-aux {
+#buttonAux {
 	background-color: transparent;
 	border-color: transparent;
 	position: absolute;
@@ -87,7 +87,10 @@ html, body {
 	left: 35px;
 }
 
-#button-start {
+#buttonAux:focus {outline:0 !important;}
+
+
+#buttonStart {
 	background-color: transparent;
 	border-color: transparent;
 	position: absolute;
@@ -96,6 +99,9 @@ html, body {
 	top: 281px;
 	left: 99px;
 }
+
+#buttonStart:focus {outline:0 !important;}
+
 
 .icon {
 	width: 24px;
@@ -106,15 +112,15 @@ html, body {
 	grid-row: 1;
 	grid-column: 4;
 }
-#connection-status {
+#connectionStatus {
 	grid-row: 1;
 	grid-column: 1;
 }
-#engine-status {
+#engineStatus {
 	grid-row: 1;
 	grid-column: 3;
 }
-#locked-status {
+#lockedStatus {
 	grid-row: 1;
 	grid-column: 2;
 }
@@ -150,17 +156,17 @@ html, body {
 	display: block;
 }
 
-#car-connected {
+#carConnected {
 	display: none;
 }
-#car-disconnected {
+#carDisconnected {
 	display: block;
 }
 
-#engine-on {
+#engineOn {
 	display: none;
 }
-#engine-off {
+#engineOff {
 	display: block;
 }
 

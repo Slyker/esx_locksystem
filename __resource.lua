@@ -22,11 +22,13 @@ ui_page 'client/html/ui.html'
 files {
     'client/html/ui.html',
     'client/html/css/ui.css',
+    'client/html/scripts/ui.js',
+    'client/html/scripts/sounds.js',
     'client/html/images/keyfob_viper.png',
-    'client/html/sounds/lock.ogg',
-	'client/html/sounds/lock2.ogg',
-    'client/html/sounds/unlock.ogg',
-    'client/html/sounds/unlock2.ogg',
+    'client/html/sounds/lock-inside.ogg',
+	'client/html/sounds/lock-outside.ogg',
+    'client/html/sounds/unlock-inside.ogg',
+    'client/html/sounds/unlock-outside.ogg',
     'client/html/sounds/beep.ogg'
 }
 
