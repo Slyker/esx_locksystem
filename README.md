@@ -1,3 +1,5 @@
+![Discord](https://img.shields.io/discord/437814881983397888.svg?label=discord)
+
 # esx_locksystem
 
 ## Description
@@ -15,7 +17,7 @@ Modified Version Of ESX LockSystem
 
 3) Add `start esx_locksystem` in your server.cfg.
 
-For help with ESX AIOMenu, the new version of ESX Identity, or the new version of ESX Locksystem, please join the discord via this link: [Discord Link](https://discord.gg/3ECcWxn) ![Discord](https://img.shields.io/discord/437814881983397888.svg?label=discord)
+For help with ESX AIOMenu, the new version of ESX Identity, or the new version of ESX Locksystem, please join the discord via this link: [Discord Link](https://discord.gg/3ECcWxn)
 
 ## Credits
 * Lead Coder: [ArkSeyonet](https://github.com/ArkSeyonet)
