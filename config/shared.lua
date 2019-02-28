@@ -1,3 +1,14 @@
+----------------------
+-- Author : Deediezi
+-- Version 4.5
+--
+-- Contributors : No contributors at the moment.
+--
+-- Github link : https://github.com/Deediezi/FiveM_LockSystem
+-- You can contribute to the project. All the information is on Github.
+
+-- Global configuration file
+
 local Keys = {
 	["ESC"] = 322, ["F1"] = 288, ["F2"] = 289, ["F3"] = 170, ["F5"] = 166, ["F6"] = 167, ["F7"] = 168, ["F8"] = 169, ["F9"] = 56, ["F10"] = 57,
 	["~"] = 243, ["1"] = 157, ["2"] = 158, ["3"] = 160, ["4"] = 164, ["5"] = 165, ["6"] = 159, ["7"] = 161, ["8"] = 162, ["9"] = 163, ["-"] = 84, ["="] = 83, ["BACKSPACE"] = 177,
@@ -11,13 +22,16 @@ local Keys = {
 }
 
 Config = {
-	hotkey = 42,					-- Use https://docs.fivem.net/game-references/controls/ to change the hotkey
-	hotkey2 = 175,
-	lockTimer = 5,					-- Time (in seconds) between actions
-	useKeyFob = false,				-- Enable or disable the Key Fob GUI
-	maxAlarmDist = 10, 				-- Set max distance the alarm audio can be heard from
-	maxAlarmVol = .25, 				-- Set max volume for the alarm audio
-	maxFobBeepDist = 10, 			-- Set max distance the fob beep audio can be heard from
-	maxFobBeepVol = .25, 			-- Set max volume for the fob beep audio
-	disableCar_NPC = true
+	Locale = "en",
+	enableGiveKey = true,			-- Enable or disable the /givekey chatCommand
+	percentage = 100,				-- Percentage chance of finding keys
+	notification = 1,				-- 0 = Disable | 1 = LockSystem notification | 2 = chatMessage notification
+	key = Keys['U'],				-- e.g : Keys["H"] will be change the U key to the H key for lock/unlock a vehicle
+	disableCar_NPC = false,			-- Set to true for disable NPC's car
+	lockTimer = 1,					-- Timer between two changes (open/close - in seconds)
+	randomMsg =	{
+			"You found an extra set of keys in the glove compartment.",
+			"You found an extra set of keys in the center console.",
+			"You found an extra set of keys under the driver\'s seat.",
+	}
 }

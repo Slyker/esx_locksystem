@@ -1,10 +1,12 @@
 # esx_locksystem
 
 ## Description
-Modified Version Of ESX LockSystem
+Modified Version Of ESX Locksystem
 
 ## Requirements
 * [es_extended](https://github.com/ESX-Org/es_extended)
+
+
 
 ## Installation
 
@@ -17,8 +19,12 @@ start esx_locksystem
 For help with ESX AIOMenu, the new version of ESX Identity, or the new version of ESX Locksystem, please join the discord via this link: https://discord.gg/3ECcWxn
 
 ## Credits
-* Lead Coder: ArkSeyonet (Github: ArkSeyonet)
-* Coder 1: JustWeb (Github: justweb1)
+* Lead Coder: ArkSeyonet
+* Coder 1: Nom Chompski
+* Coder 2: Vacant
+* QA 1: Nom Chompski
+* QA 2: Circles
+* QA 3: Vacant
 
 * Special thanks to the original creator of the script, Deediezi. His script can be found here:
 [FiveM_Locksystem](https://forum.fivem.net/t/release-locksystem-3-1-updated-the-07-16-2018-beta/17750)
