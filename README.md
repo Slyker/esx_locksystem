@@ -1,5 +1,3 @@
-![Discord](https://img.shields.io/discord/437814881983397888.svg?label=discord)
-
 # esx_locksystem
 
 ## Description
