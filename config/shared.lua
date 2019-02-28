@@ -11,13 +11,13 @@ local Keys = {
 }
 
 Config = {
-	hotkey = 42,			-- Main Hotkey For Opening UI / Locking Vehicles
-	hotkey2 = 175,			-- Sencondary Hotkey For Turning Engine On/Off
-	lockTimer = 1,			-- Time (in seconds) between actions
-	useKeyFob = true,		-- Enable or disable the Key Fob GUI
-	maxAlarmDist = 10, 		-- Set max distance the alarm audio can be heard from
-	maxAlarmVol = .25,		-- Set max volume for the alarm audio
-	maxFobBeepDist = 10,	-- Set max distance the fob beep audio can be heard from
-	maxFobBeepVol = .25,	-- Set max volume for the fob beep audio
-	disableCar_NPC = true	-- Disable stealing NPC cars
+	hotkey = 42,					-- Use https://docs.fivem.net/game-references/controls/ to change the hotkey
+	hotkey2 = 175,
+	lockTimer = 5,					-- Time (in seconds) between actions
+	useKeyFob = false,				-- Enable or disable the Key Fob GUI
+	maxAlarmDist = 10, 				-- Set max distance the alarm audio can be heard from
+	maxAlarmVol = .25, 				-- Set max volume for the alarm audio
+	maxFobBeepDist = 10, 			-- Set max distance the fob beep audio can be heard from
+	maxFobBeepVol = .25, 			-- Set max volume for the fob beep audio
+	disableCar_NPC = true
 }
