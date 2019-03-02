@@ -1,5 +1,7 @@
 # esx_locksystem
 
+NO MORE UPDATES. TIME FOR YOU TO LEARN INSTEAD OF DEPENDING ON ME TO LAY EVERYTHING OUT FOR YOU. HAVE A GOOD DAY.
+
 ## Description
 Modified Version Of ESX Locksystem
 
