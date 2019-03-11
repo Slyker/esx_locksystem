@@ -203,7 +203,7 @@ end)
 -- (fixing a bug in the previous version)
 Citizen.CreateThread(function()
 	while true do
-		Wait(0)
+		Wait(2000) -- tested, let the ped try to open the door for more RP
 		local ped = GetPlayerPed(-1)
         if DoesEntityExist(GetVehiclePedIsTryingToEnter(PlayerPedId(ped))) then
         	local veh = GetVehiclePedIsTryingToEnter(PlayerPedId(ped))
